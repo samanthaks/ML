@@ -1,5 +1,6 @@
 import scipy.io as spio
 import numpy as np
+from scipy.stats import multivariate_normal
 
 def read_file(filename):
 	'''
@@ -20,8 +21,12 @@ class MultiGauss():
 		Initializes the data
 		'''
 		self.X,self.Y = read_file('hw1data.mat')
+		self.X_training,self.Y_training,self.X_test,self.Y_test = self.split_data(.8)
 		self.separated_data = self.separate_by_label()
 		self.means,self.covs = self.get_mles()
+
+	def split_data(self,ratio):
+		return self.X,self.Y,self.X,self.Y
 
 	def separate_by_label(self):
 		'''
@@ -29,20 +34,19 @@ class MultiGauss():
 		'''
 		# Preprocessing - choose the top 200 features with the highest variance
 		vars = []
-		for feature in self.X.T:
+		for feature in self.X_training.T:
 	   		vars.append(np.var(feature))
 		inds = np.argpartition(vars, -200)[-200:]
-		new_X = self.X[:,inds]
+		new_X = self.X_training[:,inds]
 
 		# Preprocessing - normalize each of the features to have mean zero and variance one.
 		new_X = (new_X - new_X.mean(axis=0)) / new_X.std(axis=0)
 
 		# Separate data by label
 		separated_data = [[] for i in range(10)] # images for the label that corresponds to that index, i.e. [[images for label 0],[images with label 1],...]
-		for vector,label in zip(new_X,self.Y):
+		for vector,label in zip(new_X,self.Y_training):
 			separated_data[int(label)].append(vector)
 		return separated_data
-
 
 	def get_mles(self):
 		'''
@@ -58,13 +62,24 @@ class MultiGauss():
 			covs.append(np.cov(label_data,rowvar=False)+offset)
 		return means,covs
 
-	def get_probabilities(label):
-		pass
-		#return prior, conditional
+	def get_prior(self,label):
+		'''
+		Calculates prior which will be used to determine probability of label
+		'''
+		prior = len(self.separated_data[label])/len(self.X_training)
+		return prior
 
-	def calc_multigauss(label):
-		pass
-		#return probability
+	def get_conditional(self,label,image):
+		'''
+		Calculates conditional using Multivariate Gaussian formula, used to determine probability of label
+		'''
+		frac = 1/np.linalg.det(self.covs[label])
+		diff = np.subtract(image,self.means[label])
+		inverse = np.linalg.inv(self.covs[label])
+		power = np.matmul(diff.T,np.matmul(inverse,diff))
+		power = -0.5 * power
+		conditional = frac * np.exp(power)
+		return conditional
 
 	def predict(self, image):
 		'''
@@ -73,14 +88,24 @@ class MultiGauss():
 		max_probability = 0
 		max_label = -1
 		for label in range(10):
-			probability = calc_multigauss(label)
+			prior = self.get_prior(label)
+			conditional = self.get_conditional(label,image)
+			probability = prior*conditional
 			if probability > max_probability:
 				max_probability = probability
 				max_label = label
-		return label
+		return max_label
 
-	def evaluate():
-		pass
-
+	def evaluate(self):
+		'''
+		Predicts on testing data, compares to true labels
+		'''
+		predictions = []
+		for image in self.separated_data[0]:
+			label = self.predict(image)
+			predictions.append(label)
+		return (np.sum(predictions == 0))
+		
 if __name__ == "__main__":
 	mg_classifier = MultiGauss()
+	print(mg_classifier.evaluate())
