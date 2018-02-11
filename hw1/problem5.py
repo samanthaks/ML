@@ -158,8 +158,16 @@ class kNN(ProbClassifier):
 		Computes the manhattan distance between two images
 		'''
 		diff = np.subtract(image1,image2)
-		prod = np.matmul(diff.T,diff)
-		return math.sqrt(prod)
+		return np.sum(np.absolute(diff))
+
+	def max(self,image1,image2):
+		'''
+		Computes the maximum distance between two images
+		'''
+		diff = np.subtract(image1,image2)
+		diff = np.absolute(diff)
+		ind = np.argmax(diff)
+		return diff[ind]
 
 	def predict(self,test_image):
 		'''
@@ -186,12 +194,13 @@ if __name__ == "__main__":
 	# Quick check to make sure Multivariate Gaussian classifier is working
 	mg_classifier = MultiGauss('hw1data.mat',0.8)
 	print(mg_classifier.evaluate())
-
-	# Quick check to make sure k-Nearest Neighbor classifier is working
-	knn_classifier = kNN('hw1data.mat',0.8,1,'euclidean')
-	print(knn_classifier.evaluate())
 	"""
 
+	# Quick check to make sure k-Nearest Neighbor classifier is working
+	knn_classifier = kNN('hw1data.mat',0.8,1,'max')
+	print(knn_classifier.evaluate())
+
+	"""
 	# Find optimal k
 	accuracies = []
 	for k in np.arange(1,11,1):
@@ -264,3 +273,4 @@ if __name__ == "__main__":
 	plt.title('Accuracy vs. distance metric')
 	plt.legend(loc='upper left')
 	plt.savefig('5d.jpg')
+	"""
