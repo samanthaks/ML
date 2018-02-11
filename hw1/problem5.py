@@ -156,18 +156,19 @@ class kNN(ProbClassifier):
 		Predicts label given image
 		'''
 		all_dist = []
-		label = -1
 		for train_image in self.X_train:
 			curr_dist = self.euclidean(test_image,train_image)
 			all_dist.append(curr_dist)
-		inds = np.argpartition(curr_dist, -self.k)[-self.k:]
-		labels = self.Y_train[inds]
-		counts = np.bincount(labels[0])
-		return np.argmax(counts)
+		all_dist = np.asarray(all_dist)
+		inds = all_dist.argsort()[:self.k]
+		k_labels = self.Y_train[inds]
+		k_labels = k_labels.flatten()
+		pred_label = np.argmax(np.bincount(k_labels))
+		return pred_label
 		
 if __name__ == "__main__":
-	mg_classifier = MultiGauss('hw1data.mat',0.8)
-	print(mg_classifier.evaluate())
+	#mg_classifier = MultiGauss('hw1data.mat',0.8)
+	#print(mg_classifier.evaluate())
 
-	#knn_classifier = kNN('hw1data.mat',0.8)
-	#print(knn_classifier.evaluate())
+	knn_classifier = kNN('hw1data.mat',0.8)
+	print(knn_classifier.evaluate())
