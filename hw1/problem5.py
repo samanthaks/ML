@@ -2,6 +2,7 @@ import scipy.io as spio
 import numpy as np
 from random import sample
 import math
+import matplotlib.pyplot as plt
 
 class ProbClassifier():
 	def __init__(self,filename,ratio):
@@ -136,16 +137,25 @@ class kNN(ProbClassifier):
 	'''
 	k-Nearest Neighbor Classifier
 	'''
-	def __init__(self,filename,ratio):
+	def __init__(self,filename,ratio,k,metric):
 		'''
 		Initializes the data
 		'''
 		ProbClassifier.__init__(self,filename,ratio)
-		self.k = 1
+		self.k = k
+		self.metric = metric
 
 	def euclidean(self,image1,image2):
 		'''
 		Computes the euclidean distance between two images
+		'''
+		diff = np.subtract(image1,image2)
+		prod = np.matmul(diff.T,diff)
+		return math.sqrt(prod)
+
+	def manhattan(self,image1,image2):
+		'''
+		Computes the manhattan distance between two images
 		'''
 		diff = np.subtract(image1,image2)
 		prod = np.matmul(diff.T,diff)
@@ -157,7 +167,12 @@ class kNN(ProbClassifier):
 		'''
 		all_dist = []
 		for train_image in self.X_train:
-			curr_dist = self.euclidean(test_image,train_image)
+			if self.metric is 'euclidean':
+				curr_dist = self.euclidean(test_image,train_image)
+			elif self.metric is 'manhattan':
+				curr_dist = self.manhattan(test_image,train_image)
+			elif self.metric is 'max':
+				curr_dist = self.max(test_image,train_image)
 			all_dist.append(curr_dist)
 		all_dist = np.asarray(all_dist)
 		inds = all_dist.argsort()[:self.k]
@@ -167,8 +182,85 @@ class kNN(ProbClassifier):
 		return pred_label
 		
 if __name__ == "__main__":
-	#mg_classifier = MultiGauss('hw1data.mat',0.8)
-	#print(mg_classifier.evaluate())
+	"""
+	# Quick check to make sure Multivariate Gaussian classifier is working
+	mg_classifier = MultiGauss('hw1data.mat',0.8)
+	print(mg_classifier.evaluate())
 
-	knn_classifier = kNN('hw1data.mat',0.8)
+	# Quick check to make sure k-Nearest Neighbor classifier is working
+	knn_classifier = kNN('hw1data.mat',0.8,1,'euclidean')
 	print(knn_classifier.evaluate())
+	"""
+
+	# Find optimal k
+	accuracies = []
+	for k in np.arange(1,11,1):
+		knn_classifier = kNN('hw1data.mat',0.8,k,'euclidean')
+		accuracy = knn_classifier.evaluate()
+		print(k, accuracy)
+		accuracies.append(accuracy)
+	best_k = np.argmax(accuracies)+1
+	print("Most optimal k is", best_k)
+
+	plt.bar(np.arange(1,11,1), accuracies, align='center')
+	plt.axis([0, 11, 0.85, 0.95])
+	plt.xlabel('Choice of k')
+	plt.ylabel('Accuracy for 80/20 data split')
+	plt.title('Accuracy vs. k')
+	plt.savefig('finding_k.png')
+
+	# Part C - Compare the two classifiers
+	train_test_split = [.7,.75,.8,.85,.9]
+	mg_accuracies = []
+	knn_accuracies = []
+	for ratio in train_test_split:
+		mg_classifier = MultiGauss('hw1data.mat',ratio)
+		mg_accuracy = mg_classifier.evaluate()
+		print(ratio, "mg_classifier", mg_accuracy)
+		mg_accuracies.append(mg_accuracy)
+		knn_classifier = kNN('hw1data.mat',ratio,best_k,'euclidean')
+		knn_accuracy = knn_classifier.evaluate()
+		print(ratio, "knn_classifier", knn_accuracy)
+		knn_accuracies.append(knn_accuracy)
+	
+	fig = plt.figure()
+	ax1 = fig.add_subplot(111)
+	ax1.scatter(train_test_split,mg_accuracies,c='b',label='Multivariate Gaussian Classifier')
+	ax1.scatter(train_test_split,knn_accuracies,c='r',label='k-Nearest Neighbor Classifier')
+	plt.axis([0.65,0.95,0.85,0.95])
+	plt.xlabel('Proportion of data set set aside for training')
+	plt.ylabel('Accuracy of classifier')
+	plt.title('Accuracy vs. data set split')
+	plt.legend(loc='upper left')
+	plt.savefig('5c.jpg')
+
+	# Part D - Compare distance metrics
+	train_test_split = [.7,.75,.8,.85,.9]
+	euclidean_accuracies = []
+	manhattan_accuracies = []
+	max_accuracies = []
+	for ratio in train_test_split:
+		euclidean_classifier = kNN('hw1data.mat',ratio,best_k,'euclidean')
+		euclidean_accuracy = euclidean_classifier.evaluate()
+		print(ratio, "euclidean", euclidean_accuracy)
+		euclidean_accuracies.append(euclidean_accuracy)
+		manhattan_classifier = kNN('hw1data.mat',ratio,best_k,'manhattan')
+		manhattan_accuracy = manhattan_classifier.evaluate()
+		print(ratio, "euclidean", manhattan_accuracy)
+		manhattan_accuracies.append(manhattan_accuracy)
+		max_classifier = kNN('hw1data.mat',ratio,best_k,'max')
+		max_accuracy = max_classifier.evaluate()
+		print(ratio, "max", max_accuracy)
+		max_accuracies.append(max_accuracy)
+	
+	fig = plt.figure()
+	ax1 = fig.add_subplot(111)
+	ax1.scatter(train_test_split,euclidean_accuracies,c='b',label='Euclidean Distance Metric')
+	ax1.scatter(train_test_split,euclidean_accuracies,c='r',label='Manhattan Distance Metric')
+	ax1.scatter(train_test_split,euclidean_accuracies,c='y',label='Max Distance Metric')
+	plt.axis([0.65,0.95,0.85,0.95])
+	plt.xlabel('Proportion of data set set aside for training')
+	plt.ylabel('Accuracy of distance metric')
+	plt.title('Accuracy vs. distance metric')
+	plt.legend(loc='upper left')
+	plt.savefig('5d.jpg')
