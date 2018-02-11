@@ -1,6 +1,5 @@
 import scipy.io as spio
 import numpy as np
-from scipy.stats import multivariate_normal
 
 def read_file(filename):
 	'''
@@ -15,36 +14,37 @@ class MultiGauss():
 	'''
 	Multivariate Gaussian Classifier
 	'''
-
 	def __init__(self):
 		'''
 		Initializes the data
 		'''
 		self.X,self.Y = read_file('hw1data.mat')
-		self.X_training,self.Y_training,self.X_test,self.Y_test = self.split_data(.8)
+		self.preprocess_data() 
 		self.separated_data = self.separate_by_label()
 		self.means,self.covs = self.get_mles()
 
-	def split_data(self,ratio):
-		return self.X,self.Y,self.X,self.Y
+	def preprocess_data(self):
+		'''
+		Preprocess data to avoid underflow or overflow
+		'''
+		# Choose the top 200 features with the highest variance
+		vars = []
+		for feature in self.X.T:
+	   		vars.append(np.var(feature))
+		inds = np.argpartition(vars, -200)[-200:]
+		self.X = self.X[:,inds]
+		self.Y = self.Y[inds]
+
+		# Normalize each of the features to have mean zero and variance one.
+		self.X = (self.X - self.X.mean(axis=0)) / self.X.std(axis=0)
 
 	def separate_by_label(self):
 		'''
 		Creates list of lists, each containing the data for one label
 		'''
-		# Preprocessing - choose the top 200 features with the highest variance
-		vars = []
-		for feature in self.X_training.T:
-	   		vars.append(np.var(feature))
-		inds = np.argpartition(vars, -200)[-200:]
-		new_X = self.X_training[:,inds]
-
-		# Preprocessing - normalize each of the features to have mean zero and variance one.
-		new_X = (new_X - new_X.mean(axis=0)) / new_X.std(axis=0)
-
 		# Separate data by label
 		separated_data = [[] for i in range(10)] # images for the label that corresponds to that index, i.e. [[images for label 0],[images with label 1],...]
-		for vector,label in zip(new_X,self.Y_training):
+		for vector,label in zip(self.X,self.Y):
 			separated_data[int(label)].append(vector)
 		return separated_data
 
@@ -55,7 +55,7 @@ class MultiGauss():
 		# Get means, covs for each label
 		means = []
 		covs = []
-		offset = 0 * np.identity(200)
+		offset = 0.1 * np.identity(200)
 		for label_data in self.separated_data:
 			label_data = np.asarray(label_data)
 			means.append(label_data.mean(axis=0))
@@ -66,7 +66,7 @@ class MultiGauss():
 		'''
 		Calculates prior which will be used to determine probability of label
 		'''
-		prior = len(self.separated_data[label])/len(self.X_training)
+		prior = len(self.separated_data[label])/len(self.X)
 		return prior
 
 	def get_conditional(self,label,image):
@@ -101,10 +101,15 @@ class MultiGauss():
 		Predicts on testing data, compares to true labels
 		'''
 		predictions = []
-		for image in self.separated_data[0]:
+		for image in self.X[1:200,]:
 			label = self.predict(image)
 			predictions.append(label)
-		return (np.sum(predictions == 0))
+
+		count = 0
+		for pred,act in zip(predictions,self.Y[1:200,]):
+			if pred == act:
+				count += 1
+		return count/len(predictions)
 		
 if __name__ == "__main__":
 	mg_classifier = MultiGauss()
