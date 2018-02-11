@@ -1,5 +1,6 @@
 import scipy.io as spio
 import numpy as np
+import math
 
 def read_file(filename):
 	'''
@@ -110,7 +111,56 @@ class MultiGauss():
 			if pred == act:
 				count += 1
 		return count/len(predictions)
+
+class kNN():
+	'''
+	k-Nearest Neighbor Classifier
+	'''
+	def __init__(self):
+		'''
+		Initializes the data
+		'''
+		self.X,self.Y = read_file('hw1data.mat')
+
+	def euclidean(self,image1,image2):
+		'''
+		Computes the euclidean distance between two images
+		'''
+		diff = np.subtract(image1,image2)
+		prod = np.matmul(diff.T,diff)
+		return math.pow(prod,0.5)
+
+	def predict(self,test_image):
+		'''
+		Predicts label given image
+		'''
+		min_dist = float('inf')
+		label = -1
+		for (train_image,train_label) in zip(self.X,self.Y):
+			curr_dist = self.euclidean(test_image,train_image)
+			if curr_dist < min_dist:
+				min_dist = curr_dist
+				label = train_label
+		return label
+
+	def evaluate(self):
+		'''
+		Predicts on testing data, compares to true labels
+		'''
+		predictions = []
+		for image in self.X[1:200,]:
+			label = self.predict(image)
+			predictions.append(label)
+
+		count = 0
+		for pred,act in zip(predictions,self.Y[1:200,]):
+			if pred == act:
+				count += 1
+		return count/len(predictions)
 		
 if __name__ == "__main__":
-	mg_classifier = MultiGauss()
-	print(mg_classifier.evaluate())
+	#mg_classifier = MultiGauss()
+	#print(mg_classifier.evaluate())
+
+	knn_classifier = kNN()
+	print(knn_classifier.evaluate())
