@@ -5,11 +5,11 @@ import math
 import matplotlib.pyplot as plt
 
 class ProbClassifier():
-	def __init__(self,filename,ratio):
+	def __init__(self,ratio):
 		'''
 		Initializes the data
 		'''
-		self.X,self.Y = self.read_file(filename)
+		self.X,self.Y = self.read_file('hw1data.mat')
 		self.X_train,self.X_test,self.Y_train,self.Y_test = self.separate_data(ratio)
 		self.preprocess_data()
 
@@ -68,11 +68,11 @@ class MultiGauss(ProbClassifier):
 	'''
 	Multivariate Gaussian Classifier
 	'''
-	def __init__(self,filename,ratio):
+	def __init__(self,ratio):
 		'''
 		Initializes the data
 		'''
-		ProbClassifier.__init__(self,filename,ratio)
+		ProbClassifier.__init__(self,ratio)
 		self.separated_data = self.separate_by_label()
 		self.means,self.covs = self.get_mles()
 
@@ -130,18 +130,17 @@ class MultiGauss(ProbClassifier):
 			if probability > max_probability:
 				max_probability = probability
 				max_label = label
-		print(max_label)
 		return max_label
 
 class kNN(ProbClassifier):
 	'''
 	k-Nearest Neighbor Classifier
 	'''
-	def __init__(self,filename,ratio,k,metric):
+	def __init__(self,ratio,k,metric):
 		'''
 		Initializes the data
 		'''
-		ProbClassifier.__init__(self,filename,ratio)
+		ProbClassifier.__init__(self,ratio)
 		self.k = k
 		self.metric = metric
 
@@ -192,19 +191,19 @@ class kNN(ProbClassifier):
 if __name__ == "__main__":
 	"""
 	# Quick check to make sure Multivariate Gaussian classifier is working
-	mg_classifier = MultiGauss('hw1data.mat',0.8)
+	mg_classifier = MultiGauss(0.8)
 	print(mg_classifier.evaluate())
-	"""
 
 	# Quick check to make sure k-Nearest Neighbor classifier is working
-	knn_classifier = kNN('hw1data.mat',0.8,1,'max')
+	knn_classifier = kNN(0.8,1,'euclidean')
 	print(knn_classifier.evaluate())
+	"""
 
 	"""
 	# Find optimal k
 	accuracies = []
 	for k in np.arange(1,11,1):
-		knn_classifier = kNN('hw1data.mat',0.8,k,'euclidean')
+		knn_classifier = kNN(0.8,k,'euclidean')
 		accuracy = knn_classifier.evaluate()
 		print(k, accuracy)
 		accuracies.append(accuracy)
@@ -213,8 +212,8 @@ if __name__ == "__main__":
 
 	plt.bar(np.arange(1,11,1), accuracies, align='center')
 	plt.axis([0, 11, 0.85, 0.95])
-	plt.xlabel('Choice of k')
-	plt.ylabel('Accuracy for 80/20 data split')
+	plt.xlabel('k')
+	plt.ylabel('Accuracy')
 	plt.title('Accuracy vs. k')
 	plt.savefig('finding_k.png')
 
@@ -223,11 +222,11 @@ if __name__ == "__main__":
 	mg_accuracies = []
 	knn_accuracies = []
 	for ratio in train_test_split:
-		mg_classifier = MultiGauss('hw1data.mat',ratio)
+		mg_classifier = MultiGauss(ratio)
 		mg_accuracy = mg_classifier.evaluate()
 		print(ratio, "mg_classifier", mg_accuracy)
 		mg_accuracies.append(mg_accuracy)
-		knn_classifier = kNN('hw1data.mat',ratio,best_k,'euclidean')
+		knn_classifier = kNN('ratio,best_k,'euclidean')
 		knn_accuracy = knn_classifier.evaluate()
 		print(ratio, "knn_classifier", knn_accuracy)
 		knn_accuracies.append(knn_accuracy)
@@ -249,15 +248,15 @@ if __name__ == "__main__":
 	manhattan_accuracies = []
 	max_accuracies = []
 	for ratio in train_test_split:
-		euclidean_classifier = kNN('hw1data.mat',ratio,best_k,'euclidean')
+		euclidean_classifier = kNN(ratio,best_k,'euclidean')
 		euclidean_accuracy = euclidean_classifier.evaluate()
 		print(ratio, "euclidean", euclidean_accuracy)
 		euclidean_accuracies.append(euclidean_accuracy)
-		manhattan_classifier = kNN('hw1data.mat',ratio,best_k,'manhattan')
+		manhattan_classifier = kNN('ratio,best_k,'manhattan')
 		manhattan_accuracy = manhattan_classifier.evaluate()
 		print(ratio, "euclidean", manhattan_accuracy)
 		manhattan_accuracies.append(manhattan_accuracy)
-		max_classifier = kNN('hw1data.mat',ratio,best_k,'max')
+		max_classifier = kNN(ratio,best_k,'max')
 		max_accuracy = max_classifier.evaluate()
 		print(ratio, "max", max_accuracy)
 		max_accuracies.append(max_accuracy)
