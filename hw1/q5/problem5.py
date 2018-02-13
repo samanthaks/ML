@@ -238,9 +238,9 @@ if __name__ == "__main__":
 
 	fig = plt.figure()
 	ax1 = fig.add_subplot(111)
-	ax1.scatter(ratios,[0.934,0.9288,0.9375,0.935333,0.945],c='b',label='Euclidean Distance Metric')
-	ax1.scatter(ratios,[0.925,0.9316,0.9365,0.93,0.925],c='r',label='Manhattan Distance Metric')
-	ax1.scatter(ratios,[0.864666,0.864,0.868,0.85,0.882],c='y',label='Max Distance Metric')
+	ax1.scatter(ratios,euclidean_accuracies,c='b',label='Euclidean Distance Metric')
+	ax1.scatter(ratios,manhattan_accuracies,c='r',label='Manhattan Distance Metric')
+	ax1.scatter(ratios,max_accuracies,c='y',label='Max Distance Metric')
 	plt.axis([0.65,0.95,0.8,1.0])
 	plt.xlabel('Proportion of data set set aside for training')
 	plt.ylabel('Accuracy of distance metric')
