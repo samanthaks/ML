@@ -3,14 +3,17 @@ import numpy as np
 from random import sample
 import math
 import matplotlib.pyplot as plt
+import random
+from findbestk import findbestk
 
 class ProbClassifier():
-	def __init__(self,ratio):
+	def __init__(self,ratio): 
 		'''
 		Initializes the data
 		'''
+		self.ratio=ratio
 		self.X,self.Y = self.read_file('hw1data.mat')
-		self.X_train,self.X_test,self.Y_train,self.Y_test = self.separate_data(ratio)
+		self.X_train,self.Y_train,self.X_test,self.Y_test=self.separate_data()
 		self.preprocess_data()
 
 	def read_file(self,filename):
@@ -22,16 +25,16 @@ class ProbClassifier():
 		Y = np.asarray(data['Y'], dtype=np.int32)
 		return X,Y
 
-	def separate_data(self,ratio):
+	def separate_data(self):
 		'''
 		Create training and testing sets
 		'''
-		inds = sample(range(len(self.X)),int(ratio*len(self.X)))
+		inds = sample(range(len(self.X)),int(self.ratio*len(self.X)))
 		X_train = self.X[inds,]
 		X_test = np.delete(self.X,inds,axis=0)
 		Y_train = self.Y[inds]
 		Y_test = np.delete(self.Y,inds,axis=0)
-		return X_train,X_test,Y_train,Y_test
+		return X_train,Y_train,X_test,Y_test
 
 	def preprocess_data(self):
 		'''
@@ -44,7 +47,6 @@ class ProbClassifier():
 		inds = np.argpartition(vars, -200)[-200:]
 		self.X_train = self.X_train[:,inds]
 		self.X_test = self.X_test[:,inds]
-
 		# Normalize each of the features to have mean zero and variance one (do this separately for training data and testing data)
 		self.X_train = (self.X_train - self.X_train.mean(axis=0)) / self.X_train.std(axis=0)
 		self.X_test = (self.X_test - self.X_test.mean(axis=0)) / self.X_test.std(axis=0)
@@ -57,7 +59,6 @@ class ProbClassifier():
 		for image in self.X_test:
 			label = self.predict(image)
 			predictions.append(label)
-
 		count = 0
 		for pred,act in zip(predictions,self.Y_test):
 			if pred == act:
@@ -80,7 +81,7 @@ class MultiGauss(ProbClassifier):
 		'''
 		Creates list of lists, each containing the data for one label
 		'''
-		separated_data = [[] for i in range(10)] # images for the label that corresponds to that index, i.e. [[images for label 0],[images with label 1],...]
+		separated_data = [[] for i in range(10)]  # images for the label that corresponds to that index, i.e. [[images for label 0],[images with label 1],...]
 		for vector,label in zip(self.X_train,self.Y_train):
 			separated_data[int(label)].append(vector)
 		return separated_data
@@ -117,7 +118,7 @@ class MultiGauss(ProbClassifier):
 		conditional = frac * np.exp(power)
 		return conditional
 
-	def predict(self, image):
+	def predict(self,image):
 		'''
 		Predicts label for image
 		'''
@@ -149,8 +150,7 @@ class kNN(ProbClassifier):
 		Computes the euclidean distance between two images
 		'''
 		diff = np.subtract(image1,image2)
-		prod = np.matmul(diff.T,diff)
-		return math.sqrt(prod)
+		return np.matmul(diff.T,diff)
 
 	def manhattan(self,image1,image2):
 		'''
@@ -189,87 +189,61 @@ class kNN(ProbClassifier):
 		return pred_label
 		
 if __name__ == "__main__":
-	"""
-	# Quick check to make sure Multivariate Gaussian classifier is working
-	mg_classifier = MultiGauss(0.8)
-	print(mg_classifier.evaluate())
-
-	# Quick check to make sure k-Nearest Neighbor classifier is working
-	knn_classifier = kNN(0.8,1,'euclidean')
-	print(knn_classifier.evaluate())
-	"""
-
-	"""
-	# Find optimal k
-	accuracies = []
-	for k in np.arange(1,11,1):
-		knn_classifier = kNN(0.8,k,'euclidean')
-		accuracy = knn_classifier.evaluate()
-		print(k, accuracy)
-		accuracies.append(accuracy)
-	best_k = np.argmax(accuracies)+1
-	print("Most optimal k is", best_k)
-
-	plt.bar(np.arange(1,11,1), accuracies, align='center')
-	plt.axis([0, 11, 0.85, 0.95])
-	plt.xlabel('k')
-	plt.ylabel('Accuracy')
-	plt.title('Accuracy vs. k')
-	plt.savefig('finding_k.png')
+	# Find most optimal k
+	# findbestk()
 
 	# Part C - Compare the two classifiers
-	train_test_split = [.7,.75,.8,.85,.9]
+	ratios = [.7,.75,.8,.85,.9]
 	mg_accuracies = []
 	knn_accuracies = []
-	for ratio in train_test_split:
-		mg_classifier = MultiGauss(ratio)
+	for r in ratios:
+		mg_classifier = MultiGauss(ratio=r)
 		mg_accuracy = mg_classifier.evaluate()
-		print(ratio, "mg_classifier", mg_accuracy)
+		print(r, "mg_classifier", mg_accuracy)
 		mg_accuracies.append(mg_accuracy)
-		knn_classifier = kNN('ratio,best_k,'euclidean')
+		knn_classifier = kNN(ratio=r,k=1,metric='euclidean')
 		knn_accuracy = knn_classifier.evaluate()
-		print(ratio, "knn_classifier", knn_accuracy)
+		print(r, "knn_classifier", knn_accuracy)
 		knn_accuracies.append(knn_accuracy)
-	
+
 	fig = plt.figure()
 	ax1 = fig.add_subplot(111)
-	ax1.scatter(train_test_split,mg_accuracies,c='b',label='Multivariate Gaussian Classifier')
-	ax1.scatter(train_test_split,knn_accuracies,c='r',label='k-Nearest Neighbor Classifier')
-	plt.axis([0.65,0.95,0.85,0.95])
-	plt.xlabel('Proportion of data set set aside for training')
+	ax1.scatter(ratios,mg_accuracies,c='b',label='Multivariate Gaussian Classifier')
+	ax1.scatter(ratios,knn_accuracies,c='r',label='k-Nearest Neighbor Classifier')
+	plt.axis([0.65,0.95,0.90,1.0])
+	plt.xlabel('Proportion of data set used for training')
 	plt.ylabel('Accuracy of classifier')
-	plt.title('Accuracy vs. data set split')
+	plt.title('Accuracy vs. Proportion of data set used for training')
 	plt.legend(loc='upper left')
-	plt.savefig('5c.jpg')
+	plt.savefig('5c.png')
 
 	# Part D - Compare distance metrics
-	train_test_split = [.7,.75,.8,.85,.9]
+	ratios = [.7,.75,.8,.85,.9]
 	euclidean_accuracies = []
 	manhattan_accuracies = []
 	max_accuracies = []
-	for ratio in train_test_split:
-		euclidean_classifier = kNN(ratio,best_k,'euclidean')
+	for r in ratios:
+		euclidean_classifier = kNN(ratio=r,k=1,metric='euclidean')
 		euclidean_accuracy = euclidean_classifier.evaluate()
-		print(ratio, "euclidean", euclidean_accuracy)
+		print(r, "euclidean", euclidean_accuracy)
 		euclidean_accuracies.append(euclidean_accuracy)
-		manhattan_classifier = kNN('ratio,best_k,'manhattan')
+		manhattan_classifier = kNN(ratio=r,k=1,metric='manhattan')
 		manhattan_accuracy = manhattan_classifier.evaluate()
-		print(ratio, "euclidean", manhattan_accuracy)
+		print(r, "manhattan", manhattan_accuracy)
 		manhattan_accuracies.append(manhattan_accuracy)
-		max_classifier = kNN(ratio,best_k,'max')
+		max_classifier = kNN(ratio=r,k=1,metric='max')
 		max_accuracy = max_classifier.evaluate()
-		print(ratio, "max", max_accuracy)
+		print(r, "max", max_accuracy)
 		max_accuracies.append(max_accuracy)
-	
+
 	fig = plt.figure()
 	ax1 = fig.add_subplot(111)
-	ax1.scatter(train_test_split,euclidean_accuracies,c='b',label='Euclidean Distance Metric')
-	ax1.scatter(train_test_split,euclidean_accuracies,c='r',label='Manhattan Distance Metric')
-	ax1.scatter(train_test_split,euclidean_accuracies,c='y',label='Max Distance Metric')
-	plt.axis([0.65,0.95,0.85,0.95])
+	ax1.scatter(ratios,[0.934,0.9288,0.9375,0.935333,0.945],c='b',label='Euclidean Distance Metric')
+	ax1.scatter(ratios,[0.925,0.9316,0.9365,0.93,0.925],c='r',label='Manhattan Distance Metric')
+	ax1.scatter(ratios,[0.864666,0.864,0.868,0.85,0.882],c='y',label='Max Distance Metric')
+	plt.axis([0.65,0.95,0.8,1.0])
 	plt.xlabel('Proportion of data set set aside for training')
 	plt.ylabel('Accuracy of distance metric')
 	plt.title('Accuracy vs. distance metric')
 	plt.legend(loc='upper left')
-	plt.savefig('5d.jpg')
-	"""
+	plt.savefig('5d.png')
