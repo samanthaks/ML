@@ -193,7 +193,7 @@ if __name__ == "__main__":
 	# findbestk()
 
 	# Part C - Compare the two classifiers
-	ratios = [.7,.75,.8,.85,.9]
+	ratios = np.arange(0.05,0.95,0.05)
 	mg_accuracies = []
 	knn_accuracies = []
 	for r in ratios:
@@ -210,15 +210,14 @@ if __name__ == "__main__":
 	ax1 = fig.add_subplot(111)
 	ax1.scatter(ratios,mg_accuracies,c='b',label='Multivariate Gaussian Classifier')
 	ax1.scatter(ratios,knn_accuracies,c='r',label='k-Nearest Neighbor Classifier')
-	plt.axis([0.65,0.95,0.90,1.0])
+	plt.axis([0.0,1.0,0.0,1.0])
 	plt.xlabel('Proportion of data set used for training')
 	plt.ylabel('Accuracy of classifier')
 	plt.title('Accuracy vs. Proportion of data set used for training')
 	plt.legend(loc='upper left')
-	plt.savefig('5c.png')
+	plt.savefig('5c-1.png')
 
 	# Part D - Compare distance metrics
-	ratios = [.7,.75,.8,.85,.9]
 	euclidean_accuracies = []
 	manhattan_accuracies = []
 	max_accuracies = []
@@ -238,12 +237,12 @@ if __name__ == "__main__":
 
 	fig = plt.figure()
 	ax1 = fig.add_subplot(111)
-	ax1.scatter(ratios,euclidean_accuracies,c='b',label='Euclidean Distance Metric')
-	ax1.scatter(ratios,manhattan_accuracies,c='r',label='Manhattan Distance Metric')
-	ax1.scatter(ratios,max_accuracies,c='y',label='Max Distance Metric')
-	plt.axis([0.65,0.95,0.8,1.0])
+	ax1.scatter(ratios,euclidean_accuracies,c='b',label='L_1')
+	ax1.scatter(ratios,manhattan_accuracies,c='r',label='L_2')
+	ax1.scatter(ratios,max_accuracies,c='y',label='L_inf')
+	plt.axis([0.0,1.0,0.0,1.0])
 	plt.xlabel('Proportion of data set set aside for training')
 	plt.ylabel('Accuracy of distance metric')
 	plt.title('Accuracy vs. distance metric')
 	plt.legend(loc='upper left')
-	plt.savefig('5d.png')
+	plt.savefig('5d-1.png')
