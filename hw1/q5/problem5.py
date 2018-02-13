@@ -193,7 +193,7 @@ if __name__ == "__main__":
 	# findbestk()
 
 	# Part C - Compare the two classifiers
-	ratios = np.arange(0.05,0.95,0.05)
+	ratios = np.arange(0.1,0.95,0.05)
 	mg_accuracies = []
 	knn_accuracies = []
 	for r in ratios:
@@ -214,7 +214,7 @@ if __name__ == "__main__":
 	plt.xlabel('Proportion of data set used for training')
 	plt.ylabel('Accuracy of classifier')
 	plt.title('Accuracy vs. Proportion of data set used for training')
-	plt.legend(loc='upper left')
+	plt.legend(loc='lower left')
 	plt.savefig('5c-1.png')
 
 	# Part D - Compare distance metrics
@@ -244,5 +244,5 @@ if __name__ == "__main__":
 	plt.xlabel('Proportion of data set set aside for training')
 	plt.ylabel('Accuracy of distance metric')
 	plt.title('Accuracy vs. distance metric')
-	plt.legend(loc='upper left')
+	plt.legend(loc='lower left')
 	plt.savefig('5d-1.png')
