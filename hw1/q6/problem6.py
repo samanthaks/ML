@@ -1,16 +1,10 @@
 
-# coding: utf-8
-
-# In[4]:
-
-
 import scipy.io as spio
 import numpy as np
 import sys
 from random import sample
-
-
-# In[5]:
+import statistics
+from collections import Counter
 
 
 class Node(object):
@@ -22,9 +16,6 @@ class Node(object):
         self.left = None
         self.right = None
         self.data = None
-
-
-# In[13]:
 
 
 def readfile(filename):
@@ -46,9 +37,6 @@ def separate_data(X, Y, ratio):
     Y_train = Y[inds]
     Y_test = np.delete(Y,inds,axis=0)
     return X_train,Y_train,X_test,Y_test
-
-
-# In[7]:
 
 
 def build_decision_tree(examples, labels, threshold, depth, row=0):
@@ -85,30 +73,31 @@ def build_decision_tree(examples, labels, threshold, depth, row=0):
     elif depth == 0:
         #Take the mode of the labels of the remaining data    
         #Return the tree model
-        root.data = stats.mode(target)
+        root.data = Counter(labels.flatten()).most_common(1)
         return root
       
     
     #Split The Data Into Two Categories at threshold
+    left_inds = []
+    right_inds = []
     for i in range(examples.shape[1]):
-        d_col = examples[:,i]
-        d_label = labels[i]
-        left_examples = np.array()
-        right_examples = np.arra()
-        
-        
+        d_col = examples[:,i] # image
+        d_label = labels[i] # number
+
         if examples[row][i] < threshold:
-            left_examples = np.concatenate((left_examples, d_col[np.newaxis].T), axis=1)
-            left_label = np.concatenate((left_label, d_label[np.newaxis].T), axis=1)
+            left_inds.append(i)
         else:
-            right_examples = np.concatenate((right_examples, d_col))
-            left_label = np.concatenate((right_label, d_label))
+            right_inds.append(i)
+    left_examples = examples[:,left_inds]
+    left_labels = labels[left_inds]
+    right_examples = examples[:,right_inds]
+    right_labels = labels[right_inds]
     
     left_child = Node()
     right_child = Node()
     #Run Decision Tree Builder on X < T, X >=T
-    left_child = build_decision_tree(left_examples, left_label, threshold, depth-1, row+1)    
-    right_child = build_decision_tree(right_examples, right_label, threshold, depth-1, row+1)
+    left_child = build_decision_tree(left_examples, left_labels, threshold, depth-1, row+1)    
+    right_child = build_decision_tree(right_examples, right_labels, threshold, depth-1, row+1)
     
     #Aribitrary Threshold
     left_child.threshold = 128
@@ -119,10 +108,6 @@ def build_decision_tree(examples, labels, threshold, depth, row=0):
     root.right = right_child
     
     return root
-    
-
-
-# In[8]:
 
 
 def best_att(examples, attributes):
@@ -149,33 +134,28 @@ def entropy(data):
     return entropy
 
 
-# In[9]:
-
 
 def run_tree_classifier(root, data, threshold):
     idx = 0
+    """
     while threshold != None:
         if data[idx] < root.threshold:
             root = root.left
         elif root == root.right:
             idx += 1
+    """
     return root.data
 
 
-# In[10]:
-
 
 def test_tree_classifier(root, test_data, test_labels):
+    passed = 0
     for i in range(test_data.shape[1]):
-        if test_labels[i] == run_tree_classifier(root, test_data[:,i]):
+        if test_labels[i] == run_tree_classifier(root, test_data[:,i],128):
             passed += 1
     accuracy = passed/test_data.shape[1]
     return accuracy        
-        
-    
 
-
-# In[11]:
 
 
 def main():
@@ -196,9 +176,6 @@ def main():
     accuracy = test_tree_classifier(tree_classifier, X_test, Y_test)
     
     print("The accuracy of the classifer generated from the data is: %f" % accuracy)
-
-
-# In[14]:
 
 
 if __name__ == "__main__":
