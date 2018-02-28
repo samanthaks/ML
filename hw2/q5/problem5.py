@@ -3,6 +3,7 @@ from nltk.corpus import stopwords
 from random import sample
 from collections import Counter
 import pickle
+import matplotlib.pyplot as plt
 
 train_file = "hw2data_1/reviews_tr.csv"
 test_file = "hw2data_1/reviews_te.csv"
@@ -19,33 +20,33 @@ class Unigram():
 		self.vocab_size = 20000
 		self.train_ratio = train_ratio
 
-		# self.X,self.Y = self.get_data()
+		self.X,self.Y = self.get_data()
 		# pickle.dump(self.X, open("unigram_X.pkl", "wb"))
 		# pickle.dump(self.Y, open("unigram_Y.pkl", "wb"))
-		self.X = pickle.load(open("unigram_X.pkl", "rb"))
-		self.Y = pickle.load(open("unigram_Y.pkl", "rb"))
-		print("Finished separating documents from labels")
+		# self.X = pickle.load(open("unigram_X.pkl", "rb"))
+		# self.Y = pickle.load(open("unigram_Y.pkl", "rb"))
+		# print("Finished separating documents from labels")
 
-		# self.X_train,self.X_test,self.Y_train,self.Y_test = self.split_data()
+		self.X_train,self.X_test,self.Y_train,self.Y_test = self.split_data()
 		# pickle.dump(self.X_train, open("unigram_X_train.pkl", "wb"))
 		# pickle.dump(self.X_test, open("unigram_X_test.pkl", "wb"))
 		# pickle.dump(self.Y_train, open("unigram_Y_train.pkl", "wb"))
 		# pickle.dump(self.Y_test, open("unigram_Y_test.pkl", "wb"))
-		self.X_train = pickle.load(open("unigram_X_train.pkl", "rb"))
-		self.X_test = pickle.load(open("unigram_X_test.pkl", "rb"))
-		self.Y_train = pickle.load(open("unigram_Y_train.pkl", "rb"))
-		self.Y_test = pickle.load(open("unigram_Y_test.pkl", "rb"))
-		print("Finished separating training from testing")
+		# self.X_train = pickle.load(open("unigram_X_train.pkl", "rb"))
+		# self.X_test = pickle.load(open("unigram_X_test.pkl", "rb"))
+		# self.Y_train = pickle.load(open("unigram_Y_train.pkl", "rb"))
+		# self.Y_test = pickle.load(open("unigram_Y_test.pkl", "rb"))
+		# print("Finished separating training from testing")
 
-		# self.vocabulary = self.unigrams()
+		self.vocabulary = self.unigrams()
 		# pickle.dump(self.vocabulary, open("unigram_vocabulary.pkl", "wb"))
-		self.vocabulary = pickle.load(open("unigram_vocabulary.pkl", "rb"))
-		print("Finished getting unigrams")
+		# self.vocabulary = pickle.load(open("unigram_vocabulary.pkl", "rb"))
+		# print("Finished getting unigrams")
 
-		# self.weights = self.perceptron()
+		self.weights = self.perceptron()
 		# pickle.dump(self.weights, open("unigram_weights.pkl", "wb"))
-		self.weights = pickle.load(open("unigram_weights.pkl", "rb"))
-		print("Finished running perceptron")
+		# self.weights = pickle.load(open("unigram_weights.pkl", "rb"))
+		# print("Finished running perceptron")
 
 		self.accuracy = self.evaluate()
 
@@ -182,35 +183,35 @@ class Tfidf():
 		self.vocab_size = 20000
 		self.train_ratio = train_ratio
 
-		# self.X,self.Y = self.get_data()
+		self.X,self.Y = self.get_data()
 		# pickle.dump(self.X, open("tfidf_X.pkl", "wb"))
 		# pickle.dump(self.Y, open("tfidf_Y.pkl", "wb"))
-		self.X = pickle.load(open("tfidf_X.pkl", "rb"))
-		self.Y = pickle.load(open("tfidf_Y.pkl", "rb"))
-		print("Finished separating documents from labels")
+		# self.X = pickle.load(open("tfidf_X.pkl", "rb"))
+		# self.Y = pickle.load(open("tfidf_Y.pkl", "rb"))
+		# print("Finished separating documents from labels")
 
-		# self.X_train,self.X_test,self.Y_train,self.Y_test = self.split_data()
+		self.X_train,self.X_test,self.Y_train,self.Y_test = self.split_data()
 		# pickle.dump(self.X_train, open("tfidf_X_train.pkl", "wb"))
 		# pickle.dump(self.X_test, open("tfidf_X_test.pkl", "wb"))
 		# pickle.dump(self.Y_train, open("tfidf_Y_train.pkl", "wb"))
 		# pickle.dump(self.Y_test, open("tfidf_Y_test.pkl", "wb"))
-		self.X_train = pickle.load(open("tfidf_X_train.pkl", "rb"))
-		self.X_test = pickle.load(open("tfidf_X_test.pkl", "rb"))
-		self.Y_train = pickle.load(open("tfidf_Y_train.pkl", "rb"))
-		self.Y_test = pickle.load(open("tfidf_Y_test.pkl", "rb"))
-		print("Finished separating training from testing")
+		# self.X_train = pickle.load(open("tfidf_X_train.pkl", "rb"))
+		# self.X_test = pickle.load(open("tfidf_X_test.pkl", "rb"))
+		# self.Y_train = pickle.load(open("tfidf_Y_train.pkl", "rb"))
+		# self.Y_test = pickle.load(open("tfidf_Y_test.pkl", "rb"))
+		# print("Finished separating training from testing")
 
-		# self.vocabulary,self.counts = self.tfidf()
+		self.vocabulary,self.counts = self.tfidf()
 		# pickle.dump(self.vocabulary, open("tfidf_vocabulary.pkl", "wb"))
 		# pickle.dump(self.counts, open("tfidf_counts.pkl", "wb"))
-		self.vocabulary = pickle.load(open("tfidf_vocabulary.pkl", "rb"))
-		self.counts = pickle.load(open("tfidf_counts.pkl", "rb"))
-		print("Finished getting tfidf")
+		# self.vocabulary = pickle.load(open("tfidf_vocabulary.pkl", "rb"))
+		# self.counts = pickle.load(open("tfidf_counts.pkl", "rb"))
+		# print("Finished getting tfidf")
 
-		# self.weights = self.perceptron()
+		self.weights = self.perceptron()
 		# pickle.dump(self.weights, open("tfidf_weights.pkl", "wb"))
-		self.weights = pickle.load(open("tfidf_weights.pkl", "rb"))
-		print("Finished running perceptron")
+		# self.weights = pickle.load(open("tfidf_weights.pkl", "rb"))
+		# print("Finished running perceptron")
 
 		self.accuracy = self.evaluate()
 
@@ -361,33 +362,33 @@ class Bigram():
 		self.vocab_size = 20000
 		self.train_ratio = train_ratio
 
-		# self.X,self.Y = self.get_data()
+		self.X,self.Y = self.get_data()
 		# pickle.dump(self.X, open("bigram_X.pkl", "wb"))
 		# pickle.dump(self.Y, open("bigram_Y.pkl", "wb"))
-		self.X = pickle.load(open("bigram_X.pkl", "rb"))
-		self.Y = pickle.load(open("bigram_Y.pkl", "rb"))
-		print("Finished separating documents from labels")
+		# self.X = pickle.load(open("bigram_X.pkl", "rb"))
+		# self.Y = pickle.load(open("bigram_Y.pkl", "rb"))
+		# print("Finished separating documents from labels")
 
-		# self.X_train,self.X_test,self.Y_train,self.Y_test = self.split_data()
+		self.X_train,self.X_test,self.Y_train,self.Y_test = self.split_data()
 		# pickle.dump(self.X_train, open("bigram_X_train.pkl", "wb"))
 		# pickle.dump(self.X_test, open("bigram_X_test.pkl", "wb"))
 		# pickle.dump(self.Y_train, open("bigram_Y_train.pkl", "wb"))
 		# pickle.dump(self.Y_test, open("bigram_Y_test.pkl", "wb"))
-		self.X_train = pickle.load(open("bigram_X_train.pkl", "rb"))
-		self.X_test = pickle.load(open("bigram_X_test.pkl", "rb"))
-		self.Y_train = pickle.load(open("bigram_Y_train.pkl", "rb"))
-		self.Y_test = pickle.load(open("bigram_Y_test.pkl", "rb"))
-		print("Finished separating training from testing")
+		# self.X_train = pickle.load(open("bigram_X_train.pkl", "rb"))
+		# self.X_test = pickle.load(open("bigram_X_test.pkl", "rb"))
+		# self.Y_train = pickle.load(open("bigram_Y_train.pkl", "rb"))
+		# self.Y_test = pickle.load(open("bigram_Y_test.pkl", "rb"))
+		# print("Finished separating training from testing")
 		
-		# self.bigrams = self.bigrams()
+		self.bigrams = self.bigrams()
 		# pickle.dump(self.bigrams, open("bigram_bigrams.pkl", "wb"))
-		self.bigrams = pickle.load(open("bigram_bigrams.pkl", "rb"))
-		print("Finished getting bigrams")
+		# self.bigrams = pickle.load(open("bigram_bigrams.pkl", "rb"))
+		# print("Finished getting bigrams")
 
-		# self.weights = self.perceptron()
+		self.weights = self.perceptron()
 		# pickle.dump(self.weights, open("bigram_weights.pkl", "wb"))
-		self.weights = pickle.load(open("bigram_weights.pkl", "rb"))
-		print("Finished running perceptron")
+		# self.weights = pickle.load(open("bigram_weights.pkl", "rb"))
+		# print("Finished running perceptron")
 
 		self.accuracy = self.evaluate()
 
@@ -527,6 +528,7 @@ class Bigram():
 		return count/len(predictions)
 
 if __name__ == "__main__":
+	# Make sure everything is working !!
 	# Unigrams
 	# print("Starting with unigrams...")
 	# unigram_perceptron = Unigram(train_ratio=0.8)
@@ -538,6 +540,47 @@ if __name__ == "__main__":
 	# print("Tfidf accuracy", tfidf_perceptron.accuracy)
 
 	# Bigrams
-	print("Starting with bigrams...")
-	bigram_perceptron = Bigram(train_ratio=0.8)
-	print("Bigram accuracy", bigram_perceptron.accuracy)
+	# print("Starting with bigrams...")
+	# bigram_perceptron = Bigram(train_ratio=0.8)
+	# print("Bigram accuracy", bigram_perceptron.accuracy)
+
+	# Compare the data representations
+	ratios = np.arange(0.1,0.95,0.05)
+	unigram_accuracies = []
+	tfidf_accuracies = []
+	bigram_accuracies = []
+	for r in ratios:
+		unigram_perceptron = Unigram(train_ratio=r)
+		unigram_accuracy = unigram_perceptron.accuracy
+		unigram_accuracies.append(unigram_accuracy)
+		print(r, "unigram_perceptron", unigram_accuracy)
+
+		tfidf_perceptron = Tfidf(train_ratio=r)
+		tfidf_accuracy = tfidf_perceptron.accuracy
+		tfidf_accuracies.append(tfidf_accuracy)
+		print(r, "tfidf_perceptron", tfidf_accuracy)
+
+		bigram_perceptron = Bigram(train_ratio=r)
+		bigram_accuracy = bigram_perceptron.accuracy
+		bigram_accuracies.append(bigram_accuracy)
+		print(r, "bigram_perceptron", bigram_accuracy)
+
+	pickle.dump(unigram_accuracies, open("unigram_accuracies.pkl", "wb"))
+	pickle.dump(tfidf_accuracies, open("tfidf_accuaracies.pkl", "wb"))
+	pickle.dump(bigram_accuracies, open("bigram_accuracies.pkl", "wb"))
+	
+	# unigram_accuracies = pickle.load(open("unigram_accuracies.pkl", "rb"))
+	# tfidf_accuracies = pickle.load(open("tfidf_accuaracies.pkl", "rb"))
+	# bigram_accuracies = pickle.load(open("bigram_accuracies.pkl", "rb"))
+
+	fig = plt.figure()
+	ax1 = fig.add_subplot(111)
+	ax1.scatter(ratios,unigram_accuracies,c='b',label='Unigrams')
+	ax1.scatter(ratios,tfidf_accuracies,c='r',label='Tfidf')
+	ax1.scatter(ratios,bigram_accuracies,c='y',label='Bigrams')
+	plt.axis([0.0,1.0,0.85,0.9])
+	plt.xlabel('Proportion of data set used for training')
+	plt.ylabel('Accuracy of classifier')
+	plt.title('Accuracy of classifier vs. Proportion of data set used for training')
+	plt.legend(loc='lower left')
+	plt.savefig('problem5.png')
