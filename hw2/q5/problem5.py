@@ -25,6 +25,7 @@ if __name__ == "__main__":
 	# bigram_perceptron = Bigram(train_ratio=0.8)
 	# print("Bigram accuracy", bigram_perceptron.accuracy)
 
+
 	# PART C: Compare the data representations
 	ratios = np.arange(0.1,0.95,0.05)
 	unigram_accuracies = []
@@ -49,7 +50,6 @@ if __name__ == "__main__":
 	pickle.dump(unigram_accuracies, open("unigram_accuracies.pkl", "wb"))
 	pickle.dump(tfidf_accuracies, open("tfidf_accuracies.pkl", "wb"))
 	pickle.dump(bigram_accuracies, open("bigram_accuracies.pkl", "wb"))
-
 	# unigram_accuracies = pickle.load(open("unigram_accuracies.pkl", "rb"))
 	# tfidf_accuracies = pickle.load(open("tfidf_accuracies.pkl", "rb"))
 	# bigram_accuracies = pickle.load(open("bigram_accuracies.pkl", "rb"))
@@ -66,4 +66,30 @@ if __name__ == "__main__":
 	plt.legend(loc='lower left')
 	plt.savefig('problem5.png')
 
+
 	# PART D: Find the highest and lowest weights for the unigram representation
+	unigram_perceptron = Unigram(train_ratio=1.0)
+	unigram_vocabulary = unigram_perceptron.vocabulary
+	unigram_weights = unigram_perceptron.weights
+
+	pickle.dump(unigram_vocabulary, open("final_unigram_vocabulary.pkl", "wb"))
+	pickle.dump(unigram_weights, open("final_unigram_weights.pkl", "wb"))
+	# unigram_weights = pickle.load(open("final_unigram_weights.pkl", "rb"))
+	# unigram_vocabulary = pickle.load(open("final_unigram_vocabulary.pkl", "rb"))
+
+	highest_inds = unigram_weights.argsort()[-10:][::-1]
+	highest_words = []
+	for high_i in highest_inds:
+		for word,index in unigram_vocabulary.items():
+			if index == high_i:
+				highest_words.append(word)
+				continue
+	print("Words with highest weights", highest_words)
+	lowest_inds = unigram_weights.argsort()[:10][::-1]
+	lowest_words = []
+	for low_i in lowest_inds:
+		for word,index in unigram_vocabulary.items():
+			if index == low_i:
+				lowest_words.append(word)
+				continue
+	print("Words with lowest weights", lowest_words)

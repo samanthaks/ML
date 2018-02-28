@@ -47,7 +47,8 @@ class Unigram():
 		# self.weights = pickle.load(open("unigram_weights.pkl", "rb"))
 		# print("Finished running perceptron")
 
-		self.accuracy = self.evaluate()
+		if self.train_ratio < 1:
+			self.accuracy = self.evaluate()
 
 	def get_data(self):
 		'''
