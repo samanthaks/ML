@@ -47,6 +47,8 @@ class Unigram():
 		self.weights = pickle.load(open("weights.pkl", "rb"))
 		print("Finished running perceptron")
 
+		self.accuracy = self.evaluate()
+
 	def get_data(self):
 		'''
 		Get labels and documents
@@ -151,9 +153,25 @@ class Unigram():
 		'''
 		Predicts labels for test documents
 		'''
-		pass
+		predictions = []
+		for document in self.X_test:
+			document_tokens = document.split()
+			document_counter = Counter(document_tokens)
+			x = np.zeros(len(self.vocabulary))
+			for word in document_counter:
+				if word in self.vocabulary:
+					index = self.vocabulary[word]
+					x[index] = document_counter[word]
+			label = int(np.sign(np.dot(self.weights,x)))
+			predictions.append(label)
+		count = 0
+		for pred,act in zip(predictions,self.Y_test):
+			if pred == act:
+				count += 1
+		return count/len(predictions)
 
 if __name__ == "__main__":
 	# Unigrams
 	print("Starting with unigrams...")
 	unigram_perceptron = Unigram(train_ratio=0.8)
+	print(unigram_perceptron.accuracy)
