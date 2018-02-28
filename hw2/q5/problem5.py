@@ -57,13 +57,16 @@ class Unigram():
 		X = []
 		Y = []
 		with open(train_file, "r") as f:
+			row_num = 1
 			for row in f:
-				arr = row.split(",")
-				X.append(arr[1])
-				if arr[0] is "0":
-					Y.append(-1)
-				else:
-					Y.append(1)
+				if row_num > 1:
+					arr = row.split(",")
+					X.append(arr[1])
+					if arr[0] is "0":
+						Y.append(-1)
+					else:
+						Y.append(1)
+				row_num += 1
 		return X,Y
 
 	def split_data(self):
@@ -222,13 +225,16 @@ class Tfidf():
 		X = []
 		Y = []
 		with open(train_file, "r") as f:
+			row_num = 1
 			for row in f:
-				arr = row.split(",")
-				X.append(arr[1])
-				if arr[0] is "0":
-					Y.append(-1)
-				else:
-					Y.append(1)
+				if row_num > 1:
+					arr = row.split(",")
+					X.append(arr[1])
+					if arr[0] is "0":
+						Y.append(-1)
+					else:
+						Y.append(1)
+				row_num += 1
 		return X,Y
 
 	def split_data(self):
@@ -399,13 +405,16 @@ class Bigram():
 		X = []
 		Y = []
 		with open(train_file, "r") as f:
+			row_num = 1
 			for row in f:
-				arr = row.split(",")
-				X.append(arr[1])
-				if arr[0] is "0":
-					Y.append(-1)
-				else:
-					Y.append(1)
+				if row_num > 1:
+					arr = row.split(",")
+					X.append(arr[1])
+					if arr[0] is "0":
+						Y.append(-1)
+					else:
+						Y.append(1)
+				row_num += 1
 		return X,Y
 
 	def split_data(self):
