@@ -131,7 +131,7 @@ class Bigram():
 				bigram = (word1,word2)
 				document_bigrams.append(bigram)
 			document_counter = Counter(document_bigrams)
-			x = np.zeros(len(self.bigrams+1)
+			x = np.zeros(len(self.bigrams+1))
 			x[len(self.bigrams)] = 1 # data lifting, homogeneous coordinates
 			for pair in document_counter:
 				if pair in self.bigrams:
@@ -156,7 +156,7 @@ class Bigram():
 				bigram = (word1,word2)
 				document_bigrams.append(bigram)
 			document_counter = Counter(document_bigrams)
-			x = np.zeros(len(self.bigrams+1)
+			x = np.zeros(len(self.bigrams+1))
 			x[len(self.bigrams)] = 1 # data lifting, homogeneous coordinates
 			for pair in document_counter:
 				if pair in self.bigrams:
@@ -183,7 +183,7 @@ class Bigram():
 				bigram = (word1,word2)
 				document_bigrams.append(bigram)
 			document_counter = Counter(document_bigrams)
-			x = np.zeros(len(self.bigrams+1)
+			x = np.zeros(len(self.bigrams+1))
 			x[len(self.bigrams)] = 1 # data lifting, homogeneous coordinates
 			for pair in document_counter:
 				if pair in self.bigrams:
