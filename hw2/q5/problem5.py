@@ -24,10 +24,10 @@ if __name__ == "__main__":
 	# print("Starting with bigrams...")
 	# bigram_perceptron = Bigram(train_ratio=0.8)
 	# print("Bigram accuracy", bigram_perceptron.accuracy)
-
+	
 
 	# PART C: Compare the data representations
-	ratios = np.arange(0.1,0.95,0.05)
+	ratios = np.arange(0.05,1.05,0.05)
 	unigram_accuracies = []
 	tfidf_accuracies = []
 	bigram_accuracies = []
@@ -56,13 +56,14 @@ if __name__ == "__main__":
 
 	fig = plt.figure()
 	ax1 = fig.add_subplot(111)
-	ax1.scatter(ratios,unigram_accuracies,c='b',label='Unigrams')
-	ax1.scatter(ratios,tfidf_accuracies,c='r',label='Tfidf')
-	ax1.scatter(ratios,bigram_accuracies,c='y',label='Bigrams')
-	plt.axis([0.0,1.0,0.85,0.9])
-	plt.xlabel('Proportion of data set used for training')
+	num_samples = ratios * 1000000
+	ax1.scatter(num_samples,unigram_accuracies,c='b',label='Unigrams')
+	ax1.scatter(num_samples,tfidf_accuracies,c='r',label='Tfidf')
+	ax1.scatter(num_samples,bigram_accuracies,c='y',label='Bigrams')
+	plt.axis([0,1000000,0.8,0.9])
+	plt.xlabel('Number of training samples')
 	plt.ylabel('Accuracy of classifier')
-	plt.title('Accuracy of classifier vs. Proportion of data set used for training')
+	plt.title('Accuracy of classifier vs. Number of training samples')
 	plt.legend(loc='lower left')
 	plt.savefig('problem5.png')
 

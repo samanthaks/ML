@@ -19,14 +19,14 @@ class Tfidf():
 		self.vocab_size = 20000
 		self.train_ratio = train_ratio
 
-		self.X,self.Y = self.get_data()
+		self.X_train,self.X_test,self.Y_train,self.Y_test = self.get_data()
 		# pickle.dump(self.X, open("tfidf_X.pkl", "wb"))
 		# pickle.dump(self.Y, open("tfidf_Y.pkl", "wb"))
 		# self.X = pickle.load(open("tfidf_X.pkl", "rb"))
 		# self.Y = pickle.load(open("tfidf_Y.pkl", "rb"))
 		# print("Finished separating documents from labels")
 
-		self.X_train,self.X_test,self.Y_train,self.Y_test = self.split_data()
+		self.X_train,self.Y_train = self.split_data()
 		# pickle.dump(self.X_train, open("tfidf_X_train.pkl", "wb"))
 		# pickle.dump(self.X_test, open("tfidf_X_test.pkl", "wb"))
 		# pickle.dump(self.Y_train, open("tfidf_Y_train.pkl", "wb"))
@@ -49,45 +49,51 @@ class Tfidf():
 		# self.weights = pickle.load(open("tfidf_weights.pkl", "rb"))
 		# print("Finished running perceptron")
 
-		if self.train_ratio < 1:
-			self.accuracy = self.evaluate()
-			
+		self.accuracy = self.evaluate()
+
 	def get_data(self):
 		'''
 		Get labels and documents
 		'''
-		X = []
-		Y = []
+		X_train = []
+		Y_train = []
 		with open(train_file, "r") as f:
 			row_num = 1
 			for row in f:
 				if row_num > 1:
 					arr = row.split(",")
-					X.append(arr[1])
+					X_train.append(arr[1])
 					if arr[0] is "0":
-						Y.append(-1)
+						Y_train.append(-1)
 					else:
-						Y.append(1)
+						Y_train.append(1)
 				row_num += 1
-		return X,Y
+		X_test = []
+		Y_test = []
+		with open(test_file, "r") as f:
+			row_num = 1
+			for row in f:
+				if row_num > 1:
+					arr = row.split(",")
+					X_test.append(arr[1])
+					if arr[0] is "0":
+						Y_test.append(-1)
+					else:
+						Y_test.append(1)
+				row_num += 1
+		return X_train,X_test,Y_train,Y_test
 
 	def split_data(self):
 		'''
-		Separate into training and testing
+		Choose which subset of training data to use
 		'''
-		train_inds = sample(range(len(self.X)),int(self.train_ratio*len(self.X)))
+		train_inds = sample(range(len(self.X_train)),int(self.train_ratio*len(self.X_train)))
 		X_train = []
 		Y_train = []
 		for train_i in train_inds:
-			X_train.append(self.X[train_i])
-			Y_train.append(self.Y[train_i])
-		test_inds = np.delete(range(len(self.X)),train_inds)
-		X_test = []
-		Y_test = []
-		for test_i in test_inds:
-			X_test.append(self.X[test_i])
-			Y_test.append(self.Y[test_i])
-		return X_train,X_test,Y_train,Y_test
+			X_train.append(self.X_train[train_i])
+			Y_train.append(self.Y_train[train_i])
+		return X_train,Y_train
 
 	def tfidf(self):
 		'''
@@ -122,14 +128,15 @@ class Tfidf():
 		Run perceptron algorithm to get linear classifiers
 		'''
 		# Initial classifier
-		w = np.zeros(len(self.vocabulary))
+		w = np.zeros(len(self.vocabulary)+1)
 
 		# First pass
 		for document,label in zip(self.X_train,self.Y_train):
 			# Represent document as vector
 			document_tokens = document.split()
 			document_counter = Counter(document_tokens)
-			x = np.zeros(len(self.vocabulary))
+			x = np.zeros(len(self.vocabulary)+1)
+			x[len(self.vocabulary)] = 1 # data lifting, homogeneous coordinates
 			for word in document_counter:
 				if word in self.vocabulary:
 					index = self.vocabulary[word]
@@ -144,14 +151,15 @@ class Tfidf():
 		# Second pass
 		new_inds = list(range(len(self.X_train)))
 		np.random.shuffle(new_inds)
-		total_w = np.zeros(len(self.vocabulary))
+		total_w = np.zeros(len(self.vocabulary)+1)
 		for ind in new_inds:
 			document = self.X_train[ind]
 			label = self.Y_train[ind]
 			# Represent document as vector
 			document_tokens = document.split()
 			document_counter = Counter(document_tokens)
-			x = np.zeros(len(self.vocabulary))
+			x = np.zeros(len(self.vocabulary)+1)
+			x[len(self.vocabulary)] = 1 # data lifting, homogeneous coordinates
 			for word in document_counter:
 				if word in self.vocabulary:
 					index = self.vocabulary[word]
@@ -175,7 +183,8 @@ class Tfidf():
 		for document in self.X_test:
 			document_tokens = document.split()
 			document_counter = Counter(document_tokens)
-			x = np.zeros(len(self.vocabulary))
+			x = np.zeros(len(self.vocabulary)+1)
+			x[len(self.vocabulary)] = 1 # data lifting, homogeneous coordinates
 			for word in document_counter:
 				if word in self.vocabulary:
 					index = self.vocabulary[word]

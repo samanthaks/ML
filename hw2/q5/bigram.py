@@ -19,14 +19,14 @@ class Bigram():
 		self.vocab_size = 20000
 		self.train_ratio = train_ratio
 
-		self.X,self.Y = self.get_data()
+		self.X_train,self.X_test,self.Y_train,self.Y_test = self.get_data()
 		# pickle.dump(self.X, open("bigram_X.pkl", "wb"))
 		# pickle.dump(self.Y, open("bigram_Y.pkl", "wb"))
 		# self.X = pickle.load(open("bigram_X.pkl", "rb"))
 		# self.Y = pickle.load(open("bigram_Y.pkl", "rb"))
 		# print("Finished separating documents from labels")
 
-		self.X_train,self.X_test,self.Y_train,self.Y_test = self.split_data()
+		self.X_train,self.Y_train = self.split_data()
 		# pickle.dump(self.X_train, open("bigram_X_train.pkl", "wb"))
 		# pickle.dump(self.X_test, open("bigram_X_test.pkl", "wb"))
 		# pickle.dump(self.Y_train, open("bigram_Y_train.pkl", "wb"))
@@ -47,45 +47,51 @@ class Bigram():
 		# self.weights = pickle.load(open("bigram_weights.pkl", "rb"))
 		# print("Finished running perceptron")
 
-		if self.train_ratio < 1:
-			self.accuracy = self.evaluate()
+		self.accuracy = self.evaluate()
 
 	def get_data(self):
 		'''
 		Get labels and documents
 		'''
-		X = []
-		Y = []
+		X_train = []
+		Y_train = []
 		with open(train_file, "r") as f:
 			row_num = 1
 			for row in f:
 				if row_num > 1:
 					arr = row.split(",")
-					X.append(arr[1])
+					X_train.append(arr[1])
 					if arr[0] is "0":
-						Y.append(-1)
+						Y_train.append(-1)
 					else:
-						Y.append(1)
+						Y_train.append(1)
 				row_num += 1
-		return X,Y
+		X_test = []
+		Y_test = []
+		with open(test_file, "r") as f:
+			row_num = 1
+			for row in f:
+				if row_num > 1:
+					arr = row.split(",")
+					X_test.append(arr[1])
+					if arr[0] is "0":
+						Y_test.append(-1)
+					else:
+						Y_test.append(1)
+				row_num += 1
+		return X_train,X_test,Y_train,Y_test
 
 	def split_data(self):
 		'''
-		Separate into training and testing
+		Choose which subset of training data to use
 		'''
-		train_inds = sample(range(len(self.X)),int(self.train_ratio*len(self.X)))
+		train_inds = sample(range(len(self.X_train)),int(self.train_ratio*len(self.X_train)))
 		X_train = []
 		Y_train = []
 		for train_i in train_inds:
-			X_train.append(self.X[train_i])
-			Y_train.append(self.Y[train_i])
-		test_inds = np.delete(range(len(self.X)),train_inds)
-		X_test = []
-		Y_test = []
-		for test_i in test_inds:
-			X_test.append(self.X[test_i])
-			Y_test.append(self.Y[test_i])
-		return X_train,X_test,Y_train,Y_test
+			X_train.append(self.X_train[train_i])
+			Y_train.append(self.Y_train[train_i])
+		return X_train,Y_train
 
 	def bigrams(self):
 		'''
@@ -114,7 +120,7 @@ class Bigram():
 		Run perceptron algorithm to get linear classifiers
 		'''
 		# Initial classifier
-		w = np.zeros(len(self.bigrams))
+		w = np.zeros(len(self.bigrams)+1)
 
 		# First pass
 		for document,label in zip(self.X_train,self.Y_train):
@@ -125,7 +131,8 @@ class Bigram():
 				bigram = (word1,word2)
 				document_bigrams.append(bigram)
 			document_counter = Counter(document_bigrams)
-			x = np.zeros(len(self.bigrams))
+			x = np.zeros(len(self.bigrams+1)
+			x[len(self.bigrams)] = 1 # data lifting, homogeneous coordinates
 			for pair in document_counter:
 				if pair in self.bigrams:
 					index = self.bigrams[pair]
@@ -138,7 +145,7 @@ class Bigram():
 		# Second pass
 		new_inds = list(range(len(self.X_train)))
 		np.random.shuffle(new_inds)
-		total_w = np.zeros(len(self.bigrams))
+		total_w = np.zeros(len(self.bigrams)+1)
 		for ind in new_inds:
 			document = self.X_train[ind]
 			label = self.Y_train[ind]
@@ -149,7 +156,8 @@ class Bigram():
 				bigram = (word1,word2)
 				document_bigrams.append(bigram)
 			document_counter = Counter(document_bigrams)
-			x = np.zeros(len(self.bigrams))
+			x = np.zeros(len(self.bigrams+1)
+			x[len(self.bigrams)] = 1 # data lifting, homogeneous coordinates
 			for pair in document_counter:
 				if pair in self.bigrams:
 					index = self.bigrams[pair]
@@ -175,7 +183,8 @@ class Bigram():
 				bigram = (word1,word2)
 				document_bigrams.append(bigram)
 			document_counter = Counter(document_bigrams)
-			x = np.zeros(len(self.bigrams))
+			x = np.zeros(len(self.bigrams+1)
+			x[len(self.bigrams)] = 1 # data lifting, homogeneous coordinates
 			for pair in document_counter:
 				if pair in self.bigrams:
 					index = self.bigrams[pair]
