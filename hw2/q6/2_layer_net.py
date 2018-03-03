@@ -31,30 +31,30 @@ class NeuralNet_2L():
         '''
         # initialize weights randomly
         learn = 0.01 
-        alpha = 0.05
         convergence = False 
         epoch = 1
         W1 = np.random.rand(1,self.k)
         b1 = np.random.rand(self.k,1)
         W2 = np.random.rand(self.k,1)
         b2 = np.random.rand(1,1)
+        v1_arr = []
+        v2_arr = []
         while not convergence:
             print("epoch: ", epoch)
             for x,y in zip(self.X,self.Y):
                 v1 = self.f_layer(W1,b1,x) # k x 1 hidden layer
                 v2 = self.f_layer(W2,b2,v1) # 1 x 1 y output
-            # update weight parameters - TODO!!!!
-            W1_change = learn * 1
-            b1_change = learn * 1
-            W2_change = learn * 1
-            b2_change = learn * 1
-            if W1_change < alpha and b1_change < alpha and W2_change < alpha and b2_change < alpha:
-                convergence = True
-            else:
-                W1 = np.subtract(W1,W1_change)
-                b1 = np.subtract(b1,b1_change)
-                W2 = np.subtract(W2,w2_change)
-                b2 = np.subtract(b2,b2_change)
+                v1_arr.append(v1)
+                v2_arr.append(v2)
+            # update weight parameters
+            W1_change = learn * self.W1_deriv()
+            b1_change = learn * self.b1_deriv()
+            W2_change = learn * self.W2_deriv()
+            b2_change = learn * self.b2_deriv()
+            W1 = np.subtract(W1,W1_change)
+            b1 = np.subtract(b1,b1_change)
+            W2 = np.subtract(W2,w2_change)
+            b2 = np.subtract(b2,b2_change)
             epoch += 1
         return W1,b1,W2,b2
 
@@ -71,7 +71,31 @@ class NeuralNet_2L():
         '''
         return 1/(1+np.exp(-param))
 
-    def evaluate(self):
+    def W1_deriv():
+        '''
+            Partial derivative of E w.r.t W1
+        '''
+        pass
+
+    def b1_deriv():
+        '''
+            Partial derivative of E w.r.t b1
+        '''
+        pass
+
+    def W2_deriv():
+        '''
+            Partial derivative of E w.r.t. W2
+        '''
+        pass
+
+    def b2_deriv():
+        '''
+            Partial derivative of E w.r.t. b2
+        '''
+        pass
+
+    def evaluate():
         '''
             Plot network output along with given Y values for each input value X
         '''
