@@ -39,7 +39,7 @@ class NeuralNet_2L():
         b2 = np.random.rand(1,1)
         v1_arr = []
         v2_arr = []
-        while not convergence:
+        while (not convergence) or max_epoch:
             print("epoch: ", epoch)
             for x,y in zip(self.X,self.Y):
                 v1 = self.f_layer(W1,b1,x) # k x 1 hidden layer
@@ -47,14 +47,24 @@ class NeuralNet_2L():
                 v1_arr.append(v1)
                 v2_arr.append(v2)
             # update weight parameters
-            W1_change = learn * self.W1_deriv()
-            b1_change = learn * self.b1_deriv()
-            W2_change = learn * self.W2_deriv()
-            b2_change = learn * self.b2_deriv()
+            for x,y in zip(self.X,self.Y):
+                W1_change +=  self.W1_deriv()
+                b1_change +=  self.b1_deriv()
+                W2_change +=  self.W2_deriv()
+                b2_change +=  self.b2_deriv()
+            #divide each by n and then multiply by the learning ratio
+            W1_change *= (1/n) * learn
+            b2_change *= (1/n) * learn
+            W2_change *= (1/n) * learn
+            b2_change *= (1/n) * learn
+
             W1 = np.subtract(W1,W1_change)
             b1 = np.subtract(b1,b1_change)
             W2 = np.subtract(W2,w2_change)
             b2 = np.subtract(b2,b2_change)
+
+            if W1_change < .001: #this is an arbitrary learning factor
+                convergence = True
             epoch += 1
         return W1,b1,W2,b2
 
@@ -71,29 +81,36 @@ class NeuralNet_2L():
         '''
         return 1/(1+np.exp(-param))
 
-    def W1_deriv():
+
+
+
+    def W1_deriv(self, W1, W2, b1, b2, x, y):
         '''
             Partial derivative of E w.r.t W1
         '''
-        pass
+            v1 = f_layer(W1, b1, x)
+            n2 = f_layer(W2, b2, v1) 
+            deriv = (n2-y) * n2 * (1 - n2) * v1 * (1 - v1) * x
 
-    def b1_deriv():
+        return deriv
+
+    def b1_deriv(W1, W2, b1, b2, n, X, y):
         '''
             Partial derivative of E w.r.t b1
         '''
-        pass
+        return (1/n)*sum(self.f_layer(W,b,x) - (self.f_layer(W,b,x) ** 2))
 
-    def W2_deriv():
+    def W2_deriv(self, W1, W2, b1,b2, X, Y):
         '''
             Partial derivative of E w.r.t. W2
         '''
-        pass
+        return (1/n)*sum(self.f_layer(W,b,x) - (self.f_layer(W,b,x) ** 2) * x)
 
-    def b2_deriv():
+    def b2_deriv(self, W1, W2, b1,b2, X, Y):
         '''
             Partial derivative of E w.r.t. b2
         '''
-        pass
+        return (1/n)*sum(self.f_layer(W,b,x) - (self.f_layer(W,b,x) ** 2))
 
     def evaluate():
         '''
