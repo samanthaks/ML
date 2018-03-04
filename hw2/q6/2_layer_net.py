@@ -13,7 +13,7 @@ class NeuralNet_2L():
         '''
         self.X,self.Y = self.read_data(data_file)
         self.k = k
-        self.W1,self.b1,self.W2,self.b2 = self.gradient_descent()
+        self.W1,self.b1,self.W2,self.b2 = self.gradient_descent(5)
 
     def read_data(self,data_file):
         '''
@@ -25,7 +25,7 @@ class NeuralNet_2L():
         print('Finished getting X and Y from the file')
         return X,Y
 
-    def gradient_descent(self):
+    def gradient_descent(self, max_epoch):
         ''' 
             Learn the network parameters
         '''
@@ -88,9 +88,9 @@ class NeuralNet_2L():
         '''
             Partial derivative of E w.r.t W1
         '''
-            v1 = f_layer(W1, b1, x)
-            n2 = f_layer(W2, b2, v1) 
-            deriv = (n2-y) * n2 * (1 - n2) * v1 * (1 - v1) * x
+        v1 = f_layer(W1, b1, x)
+        n2 = f_layer(W2, b2, v1) 
+        deriv = (n2-y) * n2 * (1 - n2) * v1 * (1 - v1) * W2 * x
 
         return deriv
 
@@ -98,19 +98,31 @@ class NeuralNet_2L():
         '''
             Partial derivative of E w.r.t b1
         '''
-        return (1/n)*sum(self.f_layer(W,b,x) - (self.f_layer(W,b,x) ** 2))
+        v1 = f_layer(W1, b1, x)
+        n2 = f_layer(W2, b2, v1) 
+        deriv = (n2-y) * n2 * (1 - n2) * v1 * (1 - v1) * W2 
+
+        return deriv
+
 
     def W2_deriv(self, W1, W2, b1,b2, X, Y):
         '''
             Partial derivative of E w.r.t. W2
         '''
-        return (1/n)*sum(self.f_layer(W,b,x) - (self.f_layer(W,b,x) ** 2) * x)
+
+        v1 = f_layer(W1, b1, x)
+        n2 = f_layer(W2, b2, v1) 
+        deriv = (n2-y) * n2 * (1 - n2) * v1 
+        return 
 
     def b2_deriv(self, W1, W2, b1,b2, X, Y):
         '''
             Partial derivative of E w.r.t. b2
         '''
-        return (1/n)*sum(self.f_layer(W,b,x) - (self.f_layer(W,b,x) ** 2))
+        v1 = f_layer(W1, b1, x)
+        n2 = f_layer(W2, b2, v1) 
+        deriv = (n2-y) * n2 * (1 - n2) 
+        return deriv
 
     def evaluate():
         '''
