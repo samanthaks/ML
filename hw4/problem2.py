@@ -3,7 +3,6 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_circles, make_moons, make_blobs
-from sklearn.metrics.pairwise import linear_kernel, polynomial_kernel, rbf_kernel
 import pickle
 
 def euclidean(p1,p2):
@@ -199,20 +198,30 @@ def kernel(data, labels, k, kernel):
 		clusters.append([random(),random()])
 	print("Finished initializing cluster centers")
 
-	# Repeat till no more changes occur
+	# Repeat until no more changes occur
 	iteration = 1
 	labeled_data = [ [] for i in range(k) ]
 	for index, label in enumerate(labels):
 		labeled_data[label].append(index)
 
 	# Gram matrix for kernel
-	kernel_vals = None
+	kernel_vals = np.zeros((len(data),len(data)))
 	if kernel is 'lin':
-		kernel_vals = linear_kernel(data,data)
+		for row,x in enumerate(data):
+			for col,y in enumerate(data):
+				kernel_vals[row,col] = np.dot(x,y)
 	if kernel is 'poly':
-		kernel_vals = polynomial_kernel(data,data)
+		gamma = 0.001
+		c_0 = -2
+		d = 3
+		for row,x in enumerate(data):
+			for col,y in enumerate(data):
+				kernel_vals[row,col] = math.pow(gamma*np.dot(x,y) + c_0, d)
 	if kernel is 'rbf':
-		kernel_vals = rbf_kernel(data,data)
+		gamma = 5
+		for row,x in enumerate(data):
+			for col,y in enumerate(data):
+				kernel_vals[row,col] = np.exp(-gamma* np.dot(x-y,x-y))
 		
 	# Repeat till no more changes occur
 	while True:
