@@ -3,6 +3,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_circles, make_moons, make_blobs
+from sklearn.metrics.pairwise import linear_kernel, polynomial_kernel, rbf_kernel
 
 def euclidean(p1,p2):
 	'''
@@ -184,15 +185,107 @@ def plot_3(data, labels, labeled_data,clusters,n):
 	plt.savefig(name)
 	print("Finished plotting predicted")
 
+def distance(kernel):
+	'''
+	Measuring distance in kernel space
+	'''
+	pass
+
+def kernel(data, labels, k, kernel):
+	'''
+	Kernelized k-means
+	'''
+	clusters = []
+	for i in range(k):
+		clusters.append([random(),random()])
+	print("Finished initializing cluster centers")
+
+	# Repeat till no more changes occur
+	iteration = 1
+	labeled_data = [[],[],[]]
+	for index, label in enumerate(labels):
+		labeled_data[label].append(index)
+
+	# Gram matrix for kernel
+	kernel_vals = None
+	if kernel is 'lin':
+		kernel_vals = linear_kernel(data,data)
+	if kernel is 'poly':
+		kernel_vals = polynomial_kernel(data,data)
+	if kernel is 'rbf':
+		kernel_vals = rbf_kernel(data,data)
+		
+	# Repeat till no more changes occur
+	while True:
+		new_labeled_data =  [ [] for i in range(k) ]
+		for n in range(len(data)):
+			min_dist = float("inf")
+			for i in range(k):
+
+				# New distance calculation
+				d1 = kernel_vals[n][n]
+				d2 = 0
+				for i2 in labeled_data[i]:
+					d2 += kernel_vals[n][i2]
+				d2 = d2 * 2 / len(labeled_data[i])
+				d3 = 0
+				for i3a in labeled_data[i]:
+					for i3b in labeled_data[i]:
+						d3 += kernel_vals[i3a][i3b]
+				d3 = d3 / math.pow(len(labeled_data[i]),2)
+				d = d1 + d2 + d3
+				if d < min_dist:
+					min_dist = d
+					label = i
+
+			new_labeled_data[label].append(n)
+
+		new_clusters = []
+		for i in range(k):
+			labels = new_labeled_data[i]
+			points = data[labels]
+			new_clusters.append(np.mean(points,axis=0))
+
+		first_set = set(map(tuple, clusters))
+		secnd_set = set(map(tuple, new_clusters))
+		if first_set == secnd_set:
+			break
+		clusters = new_clusters
+		labeled_data = new_labeled_data
+		new_labeled_data =  [ [] for i in range(k) ]
+		print("End of iteration", iteration)
+		iteration += 1
+
+	return labeled_data, clusters
+
+def ind_to_pt(data,labeled_data,k):
+	new_labeled_data = [ [] for i in range(k)]
+	for label in range(len(labeled_data)):
+		for index in labeled_data[label]:
+			new_labeled_data[label].append(data[index])
+	return new_labeled_data
+
+
 if __name__ == "__main__":
 	data1, labels1 = make_circles()
-	labeled_data1, clusters1 = lloyds(data1,labels1,2)
-	plot_2(data1, labels1, labeled_data1, clusters1,1)
+	# labeled_data1, clusters1 = lloyds(data1,labels1,2)
+	# plot_2(data1, labels1, labeled_data1, clusters1,1)
 
-	data2, labels2 = make_moons()
-	labeled_data2, clusters2 = lloyds(data2,labels2,2)
-	plot_2(data2, labels2, labeled_data2, clusters2,2)
+	# data2, labels2 = make_moons()
+	# labeled_data2, clusters2 = lloyds(data2,labels2,2)
+	# plot_2(data2, labels2, labeled_data2, clusters2,2)
 
-	data3, labels3 = make_blobs(cluster_std=[4, 4, 4],random_state=8)
-	labeled_data3, clusters3 = lloyds(data3,labels3,3)
-	plot_3(data3,labels3, labeled_data3, clusters3,3)
+	# data3, labels3 = make_blobs(cluster_std=[4, 4, 4],random_state=8)
+	# labeled_data3, clusters3 = lloyds(data3,labels3,3)
+	# plot_3(data3,labels3, labeled_data3, clusters3,3)
+
+	# labeled_data1_lin, clusters1_lin = kernel(data1,labels1,2,'lin')
+	# labeled_data1_lin1 = ind_to_pt(data1,labeled_data1_lin,2)
+	# plot_2(data1, labels1, labeled_data1_lin1, clusters1_lin, '1 (linear kernel)')
+	labeled_data1_poly, clusters1_poly = kernel(data1,labels1,2,'poly')
+	# labeled_data1_poly1 = ind_to_pt(data1,labeled_data1_poly,2)
+	# plot_2(data1, labels1, labeled_data1_poly1, clusters1_poly, '1 (polynomial kernel)')
+	# labeled_data1_rbf, clusters1_rbf = kernel(data1,labels1,2,'rbf')
+	# labeled_data1_rbf1 = ind_to_pt(data1,labeled_data1_rbf,2)
+	# plot_2(data1, labels1, labeled_data1_rbf1, clusters1_rbf, '1 (rbf kernel)')
+
