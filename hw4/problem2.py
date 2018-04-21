@@ -70,9 +70,9 @@ def plot_2(data, labels, labeled_data,clusters,n,plot_actual=False):
 			y_vals1.append(p1[1])
 		orig_clusters = [np.mean(orig_labeled_data[0],axis=0),np.mean(orig_labeled_data[1],axis=0)]
 		ax1.scatter(x_vals0, y_vals0, c='r', label=0)
-		ax1.scatter(orig_clusters[0][0],orig_clusters[0][1], c='r')
+		ax1.scatter(orig_clusters[0][0],orig_clusters[0][1], marker='v', c='y')
 		ax1.scatter(x_vals1, y_vals1, c='b', label=1)
-		ax1.scatter(orig_clusters[1][0],orig_clusters[1][1], c='b')
+		ax1.scatter(orig_clusters[1][0],orig_clusters[1][1], marker='v', c='y',label='cluster center')
 		plt.xlabel('x')
 		plt.ylabel('y')
 		title = "dataset" + str(n)
@@ -91,15 +91,16 @@ def plot_2(data, labels, labeled_data,clusters,n,plot_actual=False):
 	y_vals0 = []
 	x_vals1 = []
 	y_vals1 = []
-	for (p0,p1) in zip(label0,label1):
+	for p0 in label0:
 		x_vals0.append(p0[0])
 		y_vals0.append(p0[1])
+	for p1 in label1:
 		x_vals1.append(p1[0])
 		y_vals1.append(p1[1])
 	ax1.scatter(x_vals0, y_vals0, c='r', label=0)
-	ax1.scatter(clusters[0][0],clusters[0][1], c='r')
+	ax1.scatter(clusters[0][0],clusters[0][1], marker='v', c='y')
 	ax1.scatter(x_vals1, y_vals1, c='b', label=1)
-	ax1.scatter(clusters[1][0],clusters[1][1], c='b')
+	ax1.scatter(clusters[1][0],clusters[1][1], marker='v', c='y',label='cluster center')
 	plt.xlabel('x')
 	plt.ylabel('y')
 	title = "k-means algorithm on dataset" + str(n)
@@ -139,11 +140,11 @@ def plot_3(data, labels, labeled_data,clusters,n,plot_actual=False):
 			y_vals2.append(p2[1])
 		orig_clusters = [np.mean(orig_labeled_data[0],axis=0),np.mean(orig_labeled_data[1],axis=0),np.mean(orig_labeled_data[2],axis=0)]
 		ax1.scatter(x_vals0, y_vals0, c='r', label=0)
-		ax1.scatter(orig_clusters[0][0],orig_clusters[0][1], c='r')
+		ax1.scatter(orig_clusters[0][0],orig_clusters[0][1], marker='v', c='y')
 		ax1.scatter(x_vals1, y_vals1, c='b', label=1)
-		ax1.scatter(orig_clusters[1][0],orig_clusters[1][1], c='b')
+		ax1.scatter(orig_clusters[1][0],orig_clusters[1][1], marker='v', c='y')
 		ax1.scatter(x_vals2, y_vals2, c='g', label=2)
-		ax1.scatter(orig_clusters[2][0],orig_clusters[2][1], c='g')
+		ax1.scatter(orig_clusters[2][0],orig_clusters[2][1], marker='v', c='y',label='cluster center')
 		plt.xlabel('x')
 		plt.ylabel('y')
 		title = "dataset" + str(n)
@@ -165,20 +166,21 @@ def plot_3(data, labels, labeled_data,clusters,n,plot_actual=False):
 	y_vals1 = []
 	x_vals2 = []
 	y_vals2 = []
-	for (p0,p1) in zip(label0,label1):
+	for p0 in label0:
 		x_vals0.append(p0[0])
 		y_vals0.append(p0[1])
+	for p1 in label1:
 		x_vals1.append(p1[0])
 		y_vals1.append(p1[1])
 	for p2 in label2:
 		x_vals2.append(p2[0])
 		y_vals2.append(p2[1])
 	ax1.scatter(x_vals0, y_vals0, c='r', label=0)
-	ax1.scatter(clusters[0][0],clusters[0][1], c='r')
+	ax1.scatter(clusters[0][0],clusters[0][1], marker='v',c='y')
 	ax1.scatter(x_vals1, y_vals1, c='b', label=1)
-	ax1.scatter(clusters[1][0],clusters[1][1], c='b')
+	ax1.scatter(clusters[1][0],clusters[1][1], marker='v',c='y')
 	ax1.scatter(x_vals2, y_vals2, c='g', label=2)
-	ax1.scatter(clusters[2][0],clusters[2][1], c='g')
+	ax1.scatter(clusters[2][0],clusters[2][1], marker='v', c='y',label='cluster center')
 	plt.xlabel('x')
 	plt.ylabel('y')
 	title = "k-means algorithm on dataset" + str(n)
@@ -208,7 +210,7 @@ def kernel(data, labels, k, kernel):
 	if kernel is 'lin':
 		kernel_vals = linear_kernel(data,data)
 	if kernel is 'poly':
-		kernel_vals = polynomial_kernel(data,data,degree=2)
+		kernel_vals = polynomial_kernel(data,data)
 	if kernel is 'rbf':
 		kernel_vals = rbf_kernel(data,data)
 		
